@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SpaceShooter</title>
+  <script src="https://cdn.jsdelivr.net/pyodide/dev/debug/pyodide.js"></script>
+</head>
+<body>
+  <div><canvas id="canvas"></canvas></div>
+  <script>
+    async function main() {
+      const pyodide = await loadPyodide();
+      await pyodide.loadPackage(["pygame-ce"])
+      await pyodide.loadPackage("micropip")
+      const micropip = pyodide.pyimport("micropip");
+      await micropip.install('http://localhost:8000/dist/spaceshooter-0.1.0-py3-none-any.whl');
+      canvas = document.querySelector("#canvas");
+      pyodide.canvas.setCanvas2D(canvas);
+      await pyodide.runPython(`
+      import os
+      # change directory to resolve resources path
+      os.chdir(os.path.dirname(__import__('SpaceShooter').__file__))
+
+      from SpaceShooter.main import App
+
+      app = App()
+      app.execute()
+      `);
+    }
+    main();
+  </script>
+</body>
+</html>
